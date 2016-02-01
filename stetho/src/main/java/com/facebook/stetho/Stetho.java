@@ -124,7 +124,7 @@ public class Stetho {
     // Hook activity tracking so that after Stetho is attached we can figure out what
     // activities are present.
     boolean isTrackingActivities = ActivityTracker.get().beginTrackingIfPossible(
-        (Application)initializer.mContext.getApplicationContext());
+        (Application)initializer.mContext.getApplicationContext()) && initializer.getViewInspectorEnabled();
     if (!isTrackingActivities) {
       LogUtil.w("Automatic activity tracking not available on this API level, caller must invoke " +
           "ActivityTracker methods manually!");
