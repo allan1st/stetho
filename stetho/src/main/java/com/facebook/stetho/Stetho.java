@@ -106,6 +106,11 @@ public class Stetho {
       protected Iterable<ChromeDevtoolsDomain> getInspectorModules() {
         return new DefaultInspectorModulesBuilder(context).finish();
       }
+
+      @Override
+      protected boolean getViewInspectorEnabled() {
+        return false;
+      }
     });
   }
 
@@ -386,6 +391,8 @@ public class Stetho {
     @Nullable
     protected abstract Iterable<ChromeDevtoolsDomain> getInspectorModules();
 
+    protected abstract boolean getViewInspectorEnabled();
+
     final void start() {
       // Note that _devtools_remote is a magic suffix understood by Chrome which causes
       // the discovery process to begin.
@@ -445,6 +452,7 @@ public class Stetho {
 
     @Nullable DumperPluginsProvider mDumperPlugins;
     @Nullable InspectorModulesProvider mInspectorModules;
+    private boolean mEnableViewInspector = true;
 
     private InitializerBuilder(Context context) {
       mContext = context.getApplicationContext();
@@ -473,6 +481,11 @@ public class Stetho {
       return this;
     }
 
+    public InitializerBuilder enableViewInspector(boolean enable) {
+      mEnableViewInspector = enable;
+      return this;
+    }
+
     public Initializer build() {
       return new BuilderBasedInitializer(this);
     }
@@ -481,11 +494,13 @@ public class Stetho {
   private static class BuilderBasedInitializer extends Initializer {
     @Nullable private final DumperPluginsProvider mDumperPlugins;
     @Nullable private final InspectorModulesProvider mInspectorModules;
+    private boolean mViewInspectorEnabled;
 
     private BuilderBasedInitializer(InitializerBuilder b) {
       super(b.mContext);
       mDumperPlugins = b.mDumperPlugins;
       mInspectorModules = b.mInspectorModules;
+      mViewInspectorEnabled = b.mEnableViewInspector;
     }
 
     @Nullable
@@ -498,6 +513,11 @@ public class Stetho {
     @Override
     protected Iterable<ChromeDevtoolsDomain> getInspectorModules() {
       return mInspectorModules != null ? mInspectorModules.get() : null;
+    }
+
+    @Override
+    protected boolean getViewInspectorEnabled() {
+      return mViewInspectorEnabled;
     }
   }
 }
